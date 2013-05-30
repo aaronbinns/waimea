@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+
+  <!-- Increase the timeout.  Some very large and complex HTML and PDF
+       files can take minutes and minutes (sometimes hours) to parse.
+       The Hadoop default on a map task to run w/o checking-in is 10
+       mins (600 sec).  Let's go with 200 hours (1200 mins or 72000
+       seconds).  This value is in milliseconds, so multiply by 1000.
+       -->
+  <property>
+    <name>mapred.task.timeout</name>
+    <value>72000000</value>
+  </property>
+
+  <!-- Apply a 1GB limit to the amount of data read from the HTTP
+       response of an (W)ARC record.  This protects against try to
+       read some ginormous record body - such as a 38GB movie. -->
+  <!--
+  <property>
+    <name>jbs.parse.content.limit</name>
+    <value>1073741824</value>
+  </property>
+  -->
+
+  <!-- Limit the size of text/plain captures to 10MB, we do run into
+       some huge ones every now and again (250MB+). -->
+  <property>
+    <name>jbs.parse.content.limit.text</name>
+    <value>10000000</value>
+  </property>
+
+  <!-- Limit the size of text/html captures to 10MB, we do run into
+       some huge ones every now and again (250MB+).
+  <property>
+    <name>jbs.parse.content.limit.html</name>
+    <value>10000000</value>
+  </property>
+  -->
+
+  <!--
+  <property>
+    <description>HTML Parser implementation. Currently the following keywords are recognized: "neko" uses NekoHTML, "tagsoup" uses TagSoup.</description>
+    <name>parser.html.impl</name>
+    <value>tagsoup</value>
+  </property>
+  -->
+
+  <!-- Over-ride the system-wide setting of -1.  With a value > 1,
+       Hadoop will catenate log files together for different tasks
+       running in the same JVM ... which sucks.  So, we use a value of
+       1 here so that each task has its logs stored separately. -->
+  <property>
+    <name>mapred.job.reuse.jvm.num.tasks</name>
+    <value>1</value>
+  </property>
+
+</configuration>

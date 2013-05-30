@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+
+  <!-- Increase default heapsize of JVMs that run tasks. -->
+  <!--
+  <property>
+    <name>mapred.child.java.opts</name>
+    <value>-Xmx6000m</value>
+  </property>
+  -->
+
+  <!-- The number of reduce tasks determines how many part-nnnnn
+       Lucene shards will be produced, which we will ultimately have
+       to merge when we deploy the index.
+    -->
+  <property> 
+    <name>mapred.reduce.tasks</name>
+    <value>1000</value>
+  </property>
+
+  <!-- Create a new JVM for each map/reduce task -->
+  <property>
+    <name>mapred.job.reuse.jvm.num.tasks</name>
+    <value>1</value>
+  </property>
+
+  <!-- Increase the RAM buffer size used by Lucene when writing documents.
+       The default (set in JBs LuceneOutputFormat) is 512MB.  Since
+       we set our JVM heap size as 4096MB (see above), we increase it
+       to be half the total heap space, or 2048MB. -->
+  <property>
+    <name>jbs.lucene.maxRAMBufferSize</name>
+    <value>2048</value>
+  </property>
+
+  <!-- Enable compression of intermediate files between the map and
+       reduce stages, i.e. the output of the map. 
+    -->
+  <property>
+    <name>mapred.compress.map.output</name>
+    <value>true</value>
+  </property>
+
+  <!-- Even though we are not compressing the output, because we are
+       writing to a Lucene index, we set the compression type to
+       BLOCK for the intermediate compression of the map outputs -->
+  <property>
+    <name>mapred.output.compression.type</name>
+    <value>BLOCK</value>
+  </property>
+
+  <!-- Increase the timeout to 240 minutes.  At the end of the reduce
+       task, we merge & optimize the Lucene index that we build in
+       ${tmp}, then copy it into HDFS.  This can take a long time, so
+       we have to increase the timeout so the TaskTracker doesn't
+       abort the task.  
+    -->
+  <property>
+    <name>mapred.task.timeout</name>
+    <value>14400000</value>
+  </property>
+
+  <!-- Produce a Lucene index -->
+  <property>
+    <name>jbs.outputformat.class</name>
+    <value>org.archive.jbs.lucene.LuceneOutputFormat</value>
+  </property>
+
+  <!-- We don't need to worry about dropping the links because the
+       dedup.pig script drops the links for us. -->
+  <!--
+  <property>
+    <name>jbs.documentMapper.dropLinks</name>
+    <value>true</value>
+  </property>
+  -->
+
+  <!-- Skip the Lucene index optimization step. -->
+  <property>
+    <name>jbs.lucene.optimize</name>
+    <value>false</value>
+  </property>
+
+</configuration>
